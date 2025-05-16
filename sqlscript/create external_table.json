@@ -1,0 +1,17 @@
+{
+	"name": "create external_table",
+	"properties": {
+		"content": {
+			"query": "---credential ,external data source ,external file format\n\nCREATE MASTER KEY ENCRYPTION BY PASSWORD ='hkv@cetas123'\n\nCREATE DATABASE SCOPED CREDENTIAL cred_hkv\nWITH \n    IDENTITY = 'Managed Identity'\n\n\nCREATE EXTERNAL DATA SOURCE source_silver --pointing data source to this container\nWITH \n(\n    LOCATION = 'https://adlsadventurework.dfs.core.windows.net/silver',\n    CREDENTIAL = cred_hkv\n)\n\n\nCREATE EXTERNAL DATA SOURCE source_gold --pointing data source to this container\nWITH \n(\n    LOCATION = 'https://adlsadventurework.dfs.core.windows.net/gold',\n    CREDENTIAL = cred_hkv\n)\n\n\n\nCREATE EXTERNAL FILE FORMAT format_parquet\nWITH\n(\n    FORMAT_TYPE = PARQUET,\n    DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec'\n)\n-------------------\n------CREATE EXTERNAL TABLE EXTSALES\n-------------------\nCREATE EXTERNAL TABLE gold.extsales\nWITH\n(\n    LOCATION = 'extsale',\n    DATA_SOURCE = source_gold,\n    FILE_FORMAT = format_parquet\n)\nAS\nSELECT * FROM gold.Sales\n\n\nSELECT * FROM gold.extsales\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "awdatabase",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
